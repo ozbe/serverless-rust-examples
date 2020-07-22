@@ -1,0 +1,15 @@
+service: demo
+provider:
+  name: aws
+  runtime: rust
+plugins:
+  - serverless-rust
+package:
+  individually: true
+functions:
+  test:
+    handler: rust-lambda
+    events:
+      - http:
+          path: /test
+          method: GET
