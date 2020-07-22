@@ -7,8 +7,8 @@ plugins:
 package:
   individually: true
 functions:
-  test:
-    handler: rust-lambda
+  hello:
+    handler: hello
     events:
       - http:
           path: /test

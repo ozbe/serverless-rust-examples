@@ -258,6 +258,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "hello"
+version = "0.1.0"
+dependencies = [
+ "aws_lambda_events",
+ "lambda_runtime",
+ "serde",
+ "serde_json",
+]
+
+[[package]]
 name = "hermit-abi"
 version = "0.1.15"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -642,16 +652,6 @@ name = "redox_syscall"
 version = "0.1.57"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "41cc0f7e4d5d4544e8861606a285bb08d3e70712ccc7d2b84d7c0ccfaf4b05ce"
-
-[[package]]
-name = "rust-lambda"
-version = "0.1.0"
-dependencies = [
- "aws_lambda_events",
- "lambda_runtime",
- "serde",
- "serde_json",
-]
 
 [[package]]
 name = "rustc-demangle"

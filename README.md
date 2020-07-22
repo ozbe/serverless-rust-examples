@@ -15,5 +15,5 @@ $ npm install
 ## Run
 
 ```bash
-$ npx serverless invoke local -f test --path test/event.json
+$ npx serverless invoke local -f hello --path test/event.json
 ```
