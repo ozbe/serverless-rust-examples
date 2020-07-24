@@ -3,9 +3,22 @@ provider:
   name: aws
   runtime: rust
 plugins:
+  - serverless-iam-roles-per-function
   - serverless-rust
 package:
   individually: true
 functions:
   aws-rust:
     handler: aws-rust
+  addNote:
+    handler: aws-rust-text-analysis-via-sns-post-processing.add_note
+    events:
+      - http:
+          path: notes
+          method: post
+          cors: true
+    iamRoleStatements:
+      - Effect: "Allow"
+        Resource: "*"
+        Action:
+          - "sns:*"

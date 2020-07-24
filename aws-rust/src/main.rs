@@ -28,6 +28,6 @@ fn handler(e: Value, _: Context) -> Result<ApiGatewayV2httpResponse, HandlerErro
         multi_value_headers: Default::default(),
         body: Some(body),
         is_base64_encoded: None,
-        cookies: vec![]
+        cookies: vec![],
     })
 }

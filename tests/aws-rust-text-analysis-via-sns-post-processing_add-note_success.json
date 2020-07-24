@@ -1,0 +1,10 @@
+{
+  "requestContext": {
+    "timeEpoch": 1,
+    "http": {}
+  },
+  "body": {
+    "note": "hello, world"
+  },
+  "isBase64Encoded": false
+}
