@@ -7,9 +7,5 @@ plugins:
 package:
   individually: true
 functions:
-  hello:
-    handler: hello
-    events:
-      - http:
-          path: /test
-          method: GET
+  aws-rust:
+    handler: aws-rust

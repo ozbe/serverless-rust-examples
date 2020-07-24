@@ -1,9 +1,7 @@
 {
-  "name": "rust-lambda",
   "devDependencies": {
+    "serverless": "^1.74.1",
+    "serverless-iam-roles-per-function": "^2.0.2",
     "serverless-rust": "^0.3.8"
-  },
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
   }
 }

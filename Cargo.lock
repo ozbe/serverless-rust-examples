@@ -22,6 +22,16 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f8aac770f1885fd7e387acedd76065302551364496e46b3dd00860b2f8359b9d"
 
 [[package]]
+name = "aws-rust"
+version = "0.1.0"
+dependencies = [
+ "aws_lambda_events",
+ "lambda_runtime",
+ "serde",
+ "serde_json",
+]
+
+[[package]]
 name = "aws_lambda_events"
 version = "0.3.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -255,16 +265,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "34f595585f103464d8d2f6e9864682d74c1601fed5e07d62b1c9058dba8246fb"
 dependencies = [
  "autocfg",
-]
-
-[[package]]
-name = "hello"
-version = "0.1.0"
-dependencies = [
- "aws_lambda_events",
- "lambda_runtime",
- "serde",
- "serde_json",
 ]
 
 [[package]]
