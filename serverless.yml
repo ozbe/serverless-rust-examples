@@ -22,3 +22,12 @@ functions:
         Resource: "*"
         Action:
           - "sns:*"
+  analyzeNote:
+    handler: aws-rust-text-analysis-via-sns-post-processing.analyze_note
+    events:
+      - sns: analyzeNote
+    iamRoleStatements:
+      - Effect: "Allow"
+        Resource: "*"
+        Action:
+          - "sns:*"
