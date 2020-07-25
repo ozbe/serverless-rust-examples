@@ -1,6 +1,0 @@
-[workspace]
-
-members = [
-    "aws-rust",
-    "aws-rust-text-analysis-via-sns-post-processing",
-]

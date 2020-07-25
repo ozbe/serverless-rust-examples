@@ -1,0 +1,11 @@
+service: demo
+provider:
+  name: aws
+  runtime: rust
+plugins:
+  - serverless-rust
+package:
+  individually: true
+functions:
+  aws-rust:
+    handler: aws-rust

@@ -1,15 +1,18 @@
 service: demo
 provider:
   name: aws
-  runtime: rust
+  stage: dev
+  iamRoleStatements:
+    - Effect: "Allow"
+      Resource: "*"
+      Action:
+        - "sns:*"
 plugins:
   - serverless-iam-roles-per-function
   - serverless-rust
 package:
   individually: true
 functions:
-  aws-rust:
-    handler: aws-rust
   addNote:
     handler: aws-rust-text-analysis-via-sns-post-processing.add_note
     events:
@@ -17,17 +20,11 @@ functions:
           path: notes
           method: post
           cors: true
-    iamRoleStatements:
-      - Effect: "Allow"
-        Resource: "*"
-        Action:
-          - "sns:*"
+    environment:
+      RUST_LOG: ${env:RUST_LOG}
   analyzeNote:
     handler: aws-rust-text-analysis-via-sns-post-processing.analyze_note
     events:
       - sns: analyzeNote
-    iamRoleStatements:
-      - Effect: "Allow"
-        Resource: "*"
-        Action:
-          - "sns:*"
+    environment:
+      RUST_LOG: ${env:RUST_LOG}

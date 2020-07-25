@@ -2,6 +2,7 @@ use lambda_http::{handler, http::header, lambda, Body, Context, IntoResponse, Re
 use log::error;
 use mime::{Mime, APPLICATION_JAVASCRIPT, TEXT_PLAIN};
 use rusoto_sns::{PublishInput, PublishResponse, Sns, SnsClient};
+use serde::de::DeserializeOwned;
 use serde::{Deserialize, Serialize};
 
 thread_local!(
@@ -28,18 +29,16 @@ async fn main() -> Result<(), Error> {
 }
 
 async fn add_note(request: Request, ctx: Context) -> Result<impl IntoResponse, Error> {
-    let note = match convert_to_note(request) {
-        Ok(n) => n,
-        _ => {
-            error!("Validation Failed");
-            return build_response(400, TEXT_PLAIN, "Couldn\'t add the note.".to_string());
-        }
+    let note = if Ok(n) = convert_to_note(request) {
+        n
+    } else {
+        error!("Validation Failed");
+        return build_response(400, TEXT_PLAIN, "Couldn\'t add the note.".to_string());
     };
-
     let aws_account_id = parse_aws_account_id(&ctx);
-    let publish_response = publish(note, aws_account_id).await;
 
-    publish_response
+    publish(note, aws_account_id)
+        .await
         .and_then(|_| {
             let response = &ResponseBody {
                 message: "Successfully added the note.".into(),
@@ -63,10 +62,9 @@ async fn add_note(request: Request, ctx: Context) -> Result<impl IntoResponse, E
 fn convert_to_note(request: Request) -> Result<String, Error> {
     request
         .body()
-        .text()
-        .ok_or_else(|| "Invalid body type".into())
-        .and_then(|t| serde_json::from_str(t).map_err(|e| e.into()))
+        .json()
         .map(|r: RequestBody| r.note)
+        .ok_or_else(|| "Invalid body type".into())
 }
 
 async fn publish(note: impl ToString, aws_account_id: &str) -> Result<PublishResponse, Error> {
@@ -98,6 +96,7 @@ fn parse_aws_account_id(ctx: &Context) -> &str {
 
 trait BodyExt {
     fn text(&self) -> Option<&str>;
+    fn json<T: DeserializeOwned>(&self) -> Option<T>;
 }
 
 impl BodyExt for Body {
@@ -107,5 +106,9 @@ impl BodyExt for Body {
         } else {
             None
         }
+    }
+
+    fn json<T: DeserializeOwned>(&self) -> Option<T> {
+        self.text().and_then(|t| serde_json::from_str(t).ok())
     }
 }
