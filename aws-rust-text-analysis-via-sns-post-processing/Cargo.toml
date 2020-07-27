@@ -1,0 +1,6 @@
+[workspace]
+
+members = [
+    "add_note",
+    "analyze_note"
+]

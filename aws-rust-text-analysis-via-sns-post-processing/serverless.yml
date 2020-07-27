@@ -1,0 +1,48 @@
+service: text-analysis
+provider:
+  name: aws
+  runtime: rust
+plugins:
+  - serverless-iam-roles-per-function
+  - serverless-rust
+package:
+  individually: true
+functions:
+  addNote:
+    handler: add_note
+    events:
+      - http:
+          path: notes
+          method: post
+          cors: true
+    environment:
+      RUST_LOG: ERROR
+      NOTES_TOPIC_ARN:
+        Ref: analyzeNoteTopic
+    iamRoleStatements:
+      - Effect: 'Allow'
+        Action:
+          - "sns:Publish"
+        Resource:
+          - Ref: analyzeNoteTopic
+  analyzeNote:
+    handler: analyze_note
+    events:
+      - sns:
+          arn: !Ref analyzeNoteTopic
+          topicName: analyzeNote
+    environment:
+      RUST_LOG: INFO
+    iamRoleStatements:
+      - Effect: 'Allow'
+        Action:
+          - "sns:Subscribe"
+        Resource:
+          - Ref: analyzeNoteTopic
+resources:
+  Resources:
+    analyzeNoteTopic:
+      Type: AWS::SNS::Topic
+      Properties:
+        DisplayName: "Analyze Note"
+        TopicName: analyzeNote
