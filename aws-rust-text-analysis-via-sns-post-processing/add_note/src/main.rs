@@ -1,5 +1,5 @@
 use lambda_http::{handler, http::header, lambda, Body, Context, IntoResponse, Request, Response};
-use log::error;
+use log::{debug, error, info};
 use mime::{Mime, APPLICATION_JAVASCRIPT, TEXT_PLAIN};
 use rusoto_sns::{PublishInput, PublishResponse, Sns, SnsClient};
 use serde::de::DeserializeOwned;
@@ -28,16 +28,20 @@ async fn main() -> Result<(), Error> {
     Ok(())
 }
 
-async fn add_note(request: Request, ctx: Context) -> Result<impl IntoResponse, Error> {
-    let note = if Ok(n) = convert_to_note(request) {
+async fn add_note(request: Request, _: Context) -> Result<impl IntoResponse, Error> {
+    info!("request: {:?}", request);
+
+    let note = if let Ok(n) = convert_to_note(request) {
         n
     } else {
         error!("Validation Failed");
-        return build_response(400, TEXT_PLAIN, "Couldn\'t add the note.".to_string());
+        return build_response(400, TEXT_PLAIN, "Couldn't add the note.".to_string());
     };
-    let aws_account_id = parse_aws_account_id(&ctx);
+    let topic_arn = std::env::var("NOTES_TOPIC_ARN").ok();
+    debug!("note: {:?}", note);
+    debug!("topic_arn: {:?}", topic_arn);
 
-    publish(note, aws_account_id)
+    publish(note, topic_arn)
         .await
         .and_then(|_| {
             let response = &ResponseBody {
@@ -54,7 +58,7 @@ async fn add_note(request: Request, ctx: Context) -> Result<impl IntoResponse, E
             build_response(
                 501,
                 TEXT_PLAIN,
-                "Couldn\'t add the note due an internal error. Please try again later.".into(),
+                "Couldn't add the note due an internal error. Please try again later.".into(),
             )
         })
 }
@@ -67,13 +71,10 @@ fn convert_to_note(request: Request) -> Result<String, Error> {
         .ok_or_else(|| "Invalid body type".into())
 }
 
-async fn publish(note: impl ToString, aws_account_id: &str) -> Result<PublishResponse, Error> {
+async fn publish(note: impl ToString, topic_arn: Option<String>) -> Result<PublishResponse, Error> {
     let mut params = PublishInput::default();
     params.message = note.to_string();
-    params.topic_arn = Some(format!(
-        "arn:aws:sns:us-east-1:{}:analyzeNote",
-        aws_account_id
-    ));
+    params.topic_arn = topic_arn;
     SNS.with(|sns| {
         let sns = sns.clone();
         async move { sns.publish(params).await }
@@ -88,10 +89,6 @@ fn build_response<T>(status: u16, content_type: Mime, body: T) -> Result<Respons
         .header(header::CONTENT_TYPE, content_type.to_string())
         .body(body)
         .map_err(|e| e.into())
-}
-
-fn parse_aws_account_id(ctx: &Context) -> &str {
-    ctx.invoked_function_arn.split(':').nth(4).unwrap()
 }
 
 trait BodyExt {
