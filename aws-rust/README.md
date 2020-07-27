@@ -11,5 +11,5 @@ $ npm install
 ## Run
 
 ```bash
-$ npx serverless invoke local -f aws-rust
+$ npx serverless invoke local -f hello
 ```

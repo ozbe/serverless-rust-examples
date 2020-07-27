@@ -7,5 +7,5 @@ plugins:
 package:
   individually: true
 functions:
-  aws-rust:
-    handler: aws-rust
+  hello:
+    handler: hello
